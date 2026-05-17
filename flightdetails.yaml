@@ -1,0 +1,275 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Flight Details Management API",
+    "description": "Comprehensive API for managing granular flight information, amenities, and operational status.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/flightdetails": {
+      "get": {
+        "summary": "List all flight details by status",
+        "description": "Retrieve a collection of detailed flight records by status.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/FlightStatus"
+            },
+            "example": "SCHEDULED, BOARDING, DEPARTED, ON_TIME, DELAYED, ARRIVED, CANCELLED"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of flight details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FlightDetail"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "listFlightDetails"
+      },
+      "post": {
+        "summary": "Create a new flight detail record",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightDetail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Flight detail record created"
+          }
+        },
+        "operationId": "createFlightDetail",
+        "description": "Create a new flight detail record."
+      }
+    },
+    "/flightdetails/{flightNumber}": {
+      "get": {
+        "summary": "Get specific flight detail",
+        "parameters": [
+          {
+            "name": "flightNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightDetail"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getFlightDetail",
+        "description": "Get a specific flight detail by flight number."
+      },
+      "patch": {
+        "summary": "Update specific flight detail fields",
+        "parameters": [
+          {
+            "name": "flightNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightDetailUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightDetail"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "updateFlightDetail",
+        "description": "Update specific flight detail fields by flight number."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FlightDetail": {
+        "type": "object",
+        "required": [
+          "flight_number",
+          "origin",
+          "destination",
+          "departure_time",
+          "status",
+          "gate",
+          "id",
+          "arrival_time",
+          "amenities"
+        ],
+        "properties": {
+          "flight_number": {
+            "type": "string",
+            "example": "SQ221"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FlightStatus"
+          },
+          "gate": {
+            "type": "string",
+            "example": "C15"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "departure_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "arrival_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amenities": {
+            "$ref": "#/components/schemas/Amenities"
+          }
+        }
+      },
+      "FlightDetailUpdate": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/FlightStatus"
+          },
+          "gate": {
+            "type": "string"
+          },
+          "departure_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "arrival_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "amenities": {
+            "$ref": "#/components/schemas/Amenities"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "iata": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "city": {
+            "type": "string"
+          },
+          "airport_name": {
+            "type": "string"
+          }
+        }
+      },
+      "Amenities": {
+        "type": "object",
+        "properties": {
+          "meals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MealType"
+            }
+          },
+          "entertainment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntertainmentType"
+            }
+          },
+          "wifi_available": {
+            "type": "boolean"
+          }
+        }
+      },
+      "FlightStatus": {
+        "type": "string",
+        "enum": [
+          "SCHEDULED",
+          "BOARDING",
+          "DEPARTED",
+          "ON_TIME",
+          "DELAYED",
+          "ARRIVED",
+          "CANCELLED"
+        ]
+      },
+      "MealType": {
+        "type": "string",
+        "enum": [
+          "STANDARD",
+          "VEGETARIAN",
+          "VEGAN",
+          "KOSHER",
+          "HALAL",
+          "GLUTEN_FREE",
+          "CHILD_MEAL"
+        ]
+      },
+      "EntertainmentType": {
+        "type": "string",
+        "enum": [
+          "SEATBACK_VIDEO",
+          "STREAM_TO_DEVICE",
+          "LIVE_TV",
+          "MUSIC_LIBRARY",
+          "NO_ENTERTAINMENT"
+        ]
+      }
+    }
+  },
+  "x-ibm-configuration": {},
+  "servers": [
+    {
+      "url": "/api/airline"
+    }
+  ]
+}

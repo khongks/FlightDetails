@@ -1,0 +1,25 @@
+# ==========================================
+# Minimal .gitignore for App Connect Enterprise
+# ==========================================
+
+# ACE/IIB Runtime and Build Artifacts
+# ------------------------------------------
+*.bar
+*.jar
+*.class
+bin/
+gen/
+
+# Toolkit/Eclipse User-Specific Configurations
+# ------------------------------------------
+.metadata/
+RemoteSystemsTempFiles/
+.recommenders/
+*.log
+
+# Windows / OS X system files
+# ------------------------------------------
+Thumbs.db
+.DS_Store
+
+test/.env

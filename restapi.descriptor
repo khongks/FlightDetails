@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:restapiDescriptor xmlns="http://com.ibm.etools.mft.descriptor.base" xmlns:ns2="http://com.ibm.etools.mft.descriptor.restapi" definitionType="openapi_3" definitionFile="flightdetails.yaml" implementation="gen/FlightDetails.msgflow" https="false" definitionWithExtRef="false" faultFormat="JSON">
+    <ns2:operations>
+        <ns2:operation name="createFlightDetail" implementation="createFlightDetail.subflow"/>
+        <ns2:operation name="getFlightDetail" implementation="getFlightDetail.subflow"/>
+        <ns2:operation name="listFlightDetails" implementation="listFlightDetails.subflow"/>
+        <ns2:operation name="updateFlightDetail" implementation="updateFlightDetail.subflow"/>
+    </ns2:operations>
+    <ns2:errorHandlers/>
+</ns2:restapiDescriptor>

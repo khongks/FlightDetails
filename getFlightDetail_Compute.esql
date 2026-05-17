@@ -1,0 +1,51 @@
+
+
+CREATE COMPUTE MODULE getFlightDetail_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		-- 1. Extract the flightNumber from the REST Path Parameter
+        -- Note: The exact location in LocalEnvironment depends on your REST node configuration,
+        -- but for standard ACE REST APIs, it is found here:
+        DECLARE flightKey CHAR InputLocalEnvironment.REST.Input.Parameters.flightNumber;
+        
+        -- 2. Create a reference to the specific record in the Shared Variable
+        DECLARE refFlight REFERENCE TO Cache_FlightDetails.FlightDetail.{flightKey};
+        
+        IF LASTMOVE(refFlight) THEN
+        	
+        	-- 3. Success: Set HTTP Status to 200 (OK)
+            SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 200;
+            
+            -- 4. Success: Copy the cached data to the output JSON root
+            -- We create a deep copy from the long-lived variable to the output message
+            SET OutputRoot.JSON.Data = refFlight;
+            
+            -- Optional: Remove internal metadata if you don't want it in the response
+            SET OutputRoot.JSON.Data.cached_at = NULL;
+            
+        ELSE
+            -- 4. Failure: Record not found in the shared row
+            -- Set HTTP Status to 404 (Not Found)
+            SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = 404;
+            
+            SET OutputRoot.JSON.Data.error = 'Flight Not Found';
+            SET OutputRoot.JSON.Data.requested_id = flightKey;
+            SET OutputRoot.JSON.Data.details = 'The flight number provided does not exist in the current cache.';
+        END IF;
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
