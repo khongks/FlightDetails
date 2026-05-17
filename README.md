@@ -5,7 +5,6 @@
 1. Package BAR file
    ```
    ibmint package --input-path . --output-bar-file FlightDetails.bar
-
    ```
 
 1. Setup environment variables of ACE integration node. For example:
